@@ -1,4 +1,4 @@
-function [pix_ice,dist_ice,sat_ice]=metaprof_satice_climate(datev,lon,lat)
+function [pix_ice,dist_ice,sat_ice]=metaprof_satice_climate2(datev,lon,lat,sat_dir)
 % This function takes the metadata of a hydrographic profile (date,lon,lat)
 % and extracts the sea ice information for that day and position from the
 % OSI-SAF satellite product. If the image is not locally available, the
@@ -83,9 +83,40 @@ search_radius=10^5;
 %% Images default info
 % image text string
 if lat>0
-    concstr='ice_conc_nh';
+    concstr='ice_conc_nh_ease';
 else
-    concstr='ice_conc_sh';
+    concstr='ice_conc_sh_ease';
+end
+% OSI-SAF ftp site
+
+indir_sat='reprocessed/ice/conc/v2p0/';
+site='osisaf.met.no';
+
+%% Access satellite image
+% download sea ice concentration image if is not locally available
+disp('Checking if the image is locally available')
+% get image local full path 
+YYs=num2str(datev(1));MMs=num2str(datev(2),'%02.f');DDs=num2str(datev(3),'%02.f');
+indir=[sat_dir  YYs '\' MMs '\'];filename=[concstr '*' YYs MMs DDs '*.nc'];
+% check if the image is there
+d=dir([indir filename]);
+if isempty(d)% if is there get the image from ftp server
+    disp('downloading missing image')
+    % connecting to ftp site
+    tic
+    f = ftp(site);
+    cd(f); sf=struct(f); sf.jobject.enterLocalPassiveMode();
+    cd(f,indir_sat);
+    % going to directory
+    cd(f,YYs);
+    cd(f,MMs);
+    % getting the image
+    mget(f,[m_elevstr '*' YYs MMs DDs '*.nc'],[sat_dir  YYs '\' MMs '\']);
+    close(f)
+    toc
+    disp('.')
+else
+    disp('Image is locally available')
 end
 
 %% Find region of interest 
@@ -98,18 +129,13 @@ lonlims=[min(lon2) max(lon2)];
 latlims=[min(lat2) max(lat2)];
 
 %% Extract image data
-% get image local full path 
-YYs=num2str(datev(1));MMs=num2str(datev(2),'%02.f');DDs=num2str(datev(3),'%02.f');
-%indir=[sat_dir  YYs '\' MMs '\'];
-filename=[concstr '*' '_' YYs MMs DDs '*.nc'];
-% check if the image is there
-indir='\\win.bsh.de\root$\Standard\Hamburg\Homes\Homes00\bm2286\ICE\ice_im\reprocessed\ice\';
-tmp=dir([indir '**\' filename]);
-indir=[tmp.folder '\'];
+tmp=dir([indir filename]);
 % get exact image name
 filename=tmp.name;
 % get indices for extraction
 [st,ct,geovars,typevars,S,strext]=get_geosubsetind(lonlims,latlims,indir,filename);
+
+if isnan(st)==0 
 % get grid
 glat=double(ncread([indir filename],'lat',st(1:2),ct(1:2)));
 glon=double(ncread([indir filename],'lon',st(1:2),ct(1:2)));
@@ -226,3 +252,8 @@ sat_ice.data=sat;
 sat_ice.st=st;sat_ice.ct=ct;
 sat_ice.radius=search_radius;
 sat_ice.image=filename;
+else
+    pix_ice=NaN;
+    dist_ice=NaN;
+    sat_ice=NaN;
+end

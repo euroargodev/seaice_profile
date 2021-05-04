@@ -133,6 +133,8 @@ tmp=dir([indir filename]);
 filename=tmp.name;
 % get indices for extraction
 [st,ct,geovars,typevars,S,strext]=get_geosubsetind(lonlims,latlims,indir,filename);
+
+if isnan(st)==0 
 % get grid
 glat=double(ncread([indir filename],'lat',st(1:2),ct(1:2)));
 glon=double(ncread([indir filename],'lon',st(1:2),ct(1:2)));
@@ -249,3 +251,8 @@ sat_ice.data=sat;
 sat_ice.st=st;sat_ice.ct=ct;
 sat_ice.radius=search_radius;
 sat_ice.image=filename;
+else
+    pix_ice=NaN;
+    dist_ice=NaN;
+    sat_ice=NaN;
+end

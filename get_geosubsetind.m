@@ -34,6 +34,7 @@ end
 [lon_pts,lat_pts]=corners(lonlims,latlims);
 in=inpolygon(lon,lat,lon_pts,lat_pts);
 [in1,in2]=ind2sub(size(lon),find(in==1));
+if isempty(in1)==0
 in1_lim=[min(in1) max(in1)];
 in2_lim=[min(in2) max(in2)];
 
@@ -42,3 +43,7 @@ st2=in2_lim(1);n2=diff(in2_lim)+1;
 
 st=[st1 st2 1];
 ct=[n1 n2 1];
+else
+    st=NaN;
+    ct=NaN;
+end
