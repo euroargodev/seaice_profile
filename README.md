@@ -10,10 +10,10 @@ A: Yes. The script selects if it should download the ice of the southern or nort
 
 Q: For the reference ice dataset, is there a limit back in time or can I use any date?
 
-A: It depends on which ice times series do you want to use. There are two functions with similar names: metaprof_satice and metaprof_satice_climate
+A1: It depends on which ice times series do you want to use. There are two functions with similar names: metaprof_satice and metaprof_satice_climate
 They are practically the same script but they access two different ftp directories (OSI-SAF ftp://osisaf.met.no/)
 metaprof_satice goes for the near real time images (10 km resolution) which span from 2005 to the present. I use this one because of availability period and resolution.
-metaprof_satice_climate uses the climate record (reprocessed) images 1979 to 2015 (25 km resolution)
+metaprof_satice_climate uses the climate record (reprocessed) images 1979 to 2015 (25 km resolution).
 A2: (Update) metaprof_satice_src includes a switch to use each database, using the input variable src. The allowed values are 'NT' and 'CLIM'.
 
 Requires:
