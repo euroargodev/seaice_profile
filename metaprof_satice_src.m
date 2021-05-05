@@ -1,4 +1,6 @@
-function [pix_ice,dist_ice,sat_ice]=metaprof_satice(datev,lon,lat,sat_dir)
+function [pix_ice,dist_ice,sat_ice]=metaprof_satice_src(datev,lon,lat,sat_dir,src)
+% *Same as metaprof_satice but you can choose between 'RT' and 'CLIM' sea 
+% ice timeseries 
 % This function takes the metadata of a hydrographic profile (date,lon,lat)
 % and extracts the sea ice information for that day and position from the
 % OSI-SAF satellite product. If the image is not locally available, the
@@ -24,7 +26,8 @@ function [pix_ice,dist_ice,sat_ice]=metaprof_satice(datev,lon,lat,sat_dir)
 % datev=[2011  11  9   21   58   44];
 % lon=-5.1730;
 % lat= 76.0195;
-% [pix_ice,dist_ice,sat_ice]=metaprof_satice(datev,lon,lat,sat_dir);
+% src='RT';% or 'CLIM'
+% [pix_ice,dist_ice,sat_ice]=metaprof_satice(datev,lon,lat,sat_dir,src);
 
 % * If images are already stored locally the images in sat_dir need to be
 % stored in subfolders as in the OSI SAF ftp website. For example, the image
@@ -74,6 +77,10 @@ function [pix_ice,dist_ice,sat_ice]=metaprof_satice(datev,lon,lat,sat_dir)
 
 % Ingrid M. Angel-Benavides (BSH)07.2020 (Matlab 2018b)
 % THE CODE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND
+%% If src is empty
+if nargin<6
+    src='RT';
+end
 %% getting ice categories info
 ice_cat_low=[1 40 70];
 n_ice_cat=numel(ice_cat_low);
@@ -81,14 +88,25 @@ ithres=[ice_cat_low 100];
 search_radius=10^5;
 
 %% Images default info
-% image text string
-if lat>0
-    concstr='ice_conc_nh_polstere-100_multi_';
-else
-    concstr='ice_conc_sh_polstere-100_multi_';
+if strcmp(src,'RT')
+    % image text string
+    if lat>0
+        concstr='ice_conc_nh_polstere-100_multi_';
+    else
+        concstr='ice_conc_sh_polstere-100_multi_';
+    end
+    % OSI-SAF ftp site
+    indir_sat='archive/ice/conc/';
+elseif strcmp(src,'CLIM')
+    if lat>0
+        concstr='ice_conc_nh_ease';
+    else
+        concstr='ice_conc_sh_ease';
+    end
+    % OSI-SAF ftp site
+    indir_sat='reprocessed/ice/conc/v2p0/';
 end
-% OSI-SAF ftp site
-indir_sat='archive/ice/conc/';
+
 site='osisaf.met.no';
 
 %% Access satellite image
@@ -96,7 +114,11 @@ site='osisaf.met.no';
 disp('Checking if the image is locally available')
 % get image local full path
 YYs=num2str(datev(1));MMs=num2str(datev(2),'%02.f');DDs=num2str(datev(3),'%02.f');
+if  strcmp(src,'RT')
 indir=[sat_dir  YYs '\' MMs '\'];filename=[concstr YYs MMs DDs '*.nc'];
+elseif  strcmp(src,'CLIM')
+    indir=[sat_dir  YYs '\' MMs '\'];filename=[concstr '*' YYs MMs DDs '*.nc'];
+end
 % check if the image is there
 d=dir([indir filename]);
 if isempty(d)% if is there get the image from ftp server
@@ -151,7 +173,7 @@ if isempty(tmp)==0
         % for the selected subset
         [ix,iy,mdist]=closest_gcell(lon, lat, glon, glat);
         if numel(ix)>1
-           ix=ix(1);iy=iy(1);mdist=mdist(1);
+            ix=ix(1);iy=iy(1);mdist=mdist(1);
         end
         % for the entire image
         aix=st(1)+ix-1;aiy=st(2)+iy-1;

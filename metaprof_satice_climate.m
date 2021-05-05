@@ -1,4 +1,4 @@
-function [pix_ice,dist_ice,sat_ice]=metaprof_satice_climate2(datev,lon,lat,sat_dir)
+function [pix_ice,dist_ice,sat_ice]=metaprof_satice_climate(datev,lon,lat,sat_dir)
 % This function takes the metadata of a hydrographic profile (date,lon,lat)
 % and extracts the sea ice information for that day and position from the
 % OSI-SAF satellite product. If the image is not locally available, the
