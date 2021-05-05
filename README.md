@@ -1,5 +1,6 @@
-# distance2ice
-Script to calculate calculate the distance to the ice (edge) from a given position (&amp; date)
+# Sea Ice Meta Profile
+Access Sea Ice concentration images for a given time and position (Metadata) and returns local sea ice information and distance to the closest sea ice.
+TLDR: Calculate the distance to the sea ice (edge) from a given position (&amp; date)
 
 Please make sure to use the latest version.
 
@@ -9,10 +10,11 @@ A: Yes. The script selects if it should download the ice of the southern or nort
 
 Q: For the reference ice dataset, is there a limit back in time or can I use any date?
 
-A: It depends on which ice times eries do you want to use. There are two functions with similar names: metaprof_satice and metaprof_satice_climate
+A: It depends on which ice times series do you want to use. There are two functions with similar names: metaprof_satice and metaprof_satice_climate
 They are practically the same script but they access two different ftp directories (OSI-SAF ftp://osisaf.met.no/)
 metaprof_satice goes for the near real time images (10 km resolution) which span from 2005 to the present. I use this one because of availability period and resolution.
-Metaprof_satice_climate uses the climate record (reprocessed) images 1979 to 2015 (25 km resolution)
+metaprof_satice_climate uses the climate record (reprocessed) images 1979 to 2015 (25 km resolution)
+A2: (Update) metaprof_satice_src includes a switch to use each database, using the input variable src. The allowed values are 'NT' and 'CLIM'.
 
 Requires:
 - m_map,
