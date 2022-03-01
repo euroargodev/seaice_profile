@@ -20,3 +20,13 @@ They are practically the same script but they access two different ftp directori
 Requires:
 - m_map,
 - imab toolbox https://github.com/imab4bsh/imab
+
+## Funding
+
+This work is part of the EA-RISE project, funded by the European Union’s Horizon 2020 research and innovation programme under grant agreement No. 824131
+
+<img src="https://www.euro-argo.eu/var/storage/images/_aliases/fullsize/medias-ifremer/medias-euro_argo/logos/euro-argo-rise-logo/1688041-1-eng-GB/Euro-argo-RISE-logo.png" width="100" />
+
+and is developed by the Federal Maritime and Hydrographic Agency (Bundesamt für Seeschifffahrt und Hydrographie, BSH) 
+
+<img src="https://www.bsh.de/SiteGlobals/Frontend/Images/logo.png?__blob=normal&v=9" width="50" />
