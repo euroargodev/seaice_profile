@@ -241,7 +241,7 @@ if isempty(tmp)==0
         % Pixel data
         pix_ice.sic=sat_pix(:,:,1);
         pix_ice.lon=lon_pix;
-        pix_ice.lon=lat_pix;
+        pix_ice.lat=lat_pix;
         pix_ice.data=squeeze(sat_pix);
         pix_ice.dist=mdist;
         pix_ice.ix=ix;pix_ice.iy=iy;
@@ -260,7 +260,8 @@ if isempty(tmp)==0
         dist_ice.aix=aix_ice;dist_ice.aiy=aiy_ice;
         
         % Satellite data
-        sat_ice.lon=glon;sat_ice.lat=glat;
+        sat_ice.lon=glon;
+        sat_ice.lat=glat;
         sat_ice.vars=geovars;
         sat_ice.data=sat;
         sat_ice.st=st;sat_ice.ct=ct;
