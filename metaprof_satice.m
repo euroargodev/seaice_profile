@@ -104,16 +104,27 @@ if isempty(d)% if is there get the image from ftp server
     % connecting to ftp site
     tic
     f = ftp(site);
-    cd(f); sf=struct(f); sf.jobject.enterLocalPassiveMode();
+    %cd(f); sf=struct(f); sf.jobject.enterLocalPassiveMode();
     cd(f,indir_sat);
     % going to directory
-    cd(f,YYs);
-    cd(f,MMs);
-    % getting the image
-    mget(f,[concstr YYs MMs DDs '*.nc'],[sat_dir  YYs '\' MMs '\']);
-    close(f)
-    toc
-    disp('.')
+   
+    if isempty(dir(f,YYs))
+        disp('Date not in catalog')
+    else
+        cd(f,YYs);
+        if isempty(dir(f,MMs))
+            display('Date not in catalog')
+        else
+            cd(f,MMs);
+        end
+        % getting the image
+        disp('downloading w. mget')   
+        mget(f,[concstr YYs MMs DDs '*.nc'],[sat_dir  YYs '\' MMs '\']);
+        close(f)
+        toc
+        disp('.')
+    end
+   
 else
     disp('Image is locally available')
 end
