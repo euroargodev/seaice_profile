@@ -1,4 +1,4 @@
-function [pix_ice,dist_ice,sat_ice]=metaprof_satice(datev,lon,lat,sat_dir)
+function [pix_ice,dist_ice,sat_ice]=metaprof_satice(datev,lon,lat,sat_dir,lonf)
 % This function takes the metadata of a hydrographic profile (date,lon,lat)
 % and extracts the sea ice information for that day and position from the
 % OSI-SAF satellite product. If the image is not locally available, the
@@ -133,10 +133,18 @@ end
 % get points in a circle
 [lon2,lat2,a21] = m_fdist(lon,lat,0:10:360,search_radius);
 % convert longitude
-lon2=convertlon(lon2,180);
+if lonf == 360
+   lon2=convertlon(lon2,360);
+else 
+    lon2=convertlon(lon2,180);
+end
 % find limits to extract image pixels in the region
-lonlims=[min(lon2) max(lon2)];
 latlims=[min(lat2) max(lat2)];
+lonlims=[min(lon2) max(lon2)];
+if lonlims(2)>359
+   lonlims=359;
+end
+
 
 %% Extract image data
 tmp=dir([indir filename]);
@@ -144,12 +152,17 @@ tmp=dir([indir filename]);
 if isempty(tmp)==0
     filename=tmp.name;
     % get indices for extraction
-    [st,ct,geovars,typevars,S,strext]=get_geosubsetind(lonlims,latlims,indir,filename);
+    [st,ct,geovars,typevars,S,strext]=get_geosubsetind(lonlims,latlims,indir,filename,lonf);
     
     if isnan(st)==0
         % get grid
         glat=double(ncread([indir filename],'lat',st(1:2),ct(1:2)));
         glon=double(ncread([indir filename],'lon',st(1:2),ct(1:2)));
+        if lonf == 360
+            glon=convertlon(glon,360);
+        else
+            glon=convertlon(glon,180);
+        end        
         % get geovariables in area
         fip=[indir,filename];
         for j=1:numel(geovars)
@@ -240,6 +253,7 @@ if isempty(tmp)==0
         
         % Pixel data
         pix_ice.sic=sat_pix(:,:,1);
+        pix_ice.sic_unfilt=sat_pix(:,:,2);
         pix_ice.lon=lon_pix;
         pix_ice.lat=lat_pix;
         pix_ice.data=squeeze(sat_pix);
@@ -247,6 +261,7 @@ if isempty(tmp)==0
         pix_ice.ix=ix;pix_ice.iy=iy;
         pix_ice.aix=aix;pix_ice.aiy=aiy;
         pix_ice.vars=geovars;
+        pix_ice.status=[];
         
         % Distance to ice
         dist_ice.ice_cat_lb=ice_cat_low;
@@ -267,17 +282,20 @@ if isempty(tmp)==0
         sat_ice.st=st;sat_ice.ct=ct;
         sat_ice.radius=search_radius;
         sat_ice.image=filename;
+        sat_ice.status=[];
     else
         disp('Position is not coverd by the satellite images')
         pix_ice.sic=[];
+        pix_ice.sic_unfilt=[];
         pix_ice.lon=[];
-        pix_ice.lon=[];
+        pix_ice.lat=[];
         pix_ice.data=[];
         pix_ice.dist=[];
         pix_ice.ix=[];pix_ice.iy=[];
         pix_ice.aix=[];pix_ice.aiy=[];
         pix_ice.vars=[];
-        
+        pix_ice.status=[];
+
         % Distance to ice
         dist_ice.ice_cat_lb=[];
         dist_ice.isin=[];
@@ -296,17 +314,20 @@ if isempty(tmp)==0
         sat_ice.st=[];sat_ice.ct=[];
         sat_ice.radius=[];
         sat_ice.image=filename;
+        sat_ice.status=[];
     end
 else
     disp('image is missing in the ftp server')
     pix_ice.sic=[];
+    pix_ice.sic_unfilt=[];
     pix_ice.lon=[];
-    pix_ice.lon=[];
+    pix_ice.lat=[];
     pix_ice.data=[];
     pix_ice.dist=[];
     pix_ice.ix=[];pix_ice.iy=[];
     pix_ice.aix=[];pix_ice.aiy=[];
     pix_ice.vars=[];
+    pix_ice.status=[];
     
     % Distance to ice
     dist_ice.ice_cat_lb=[];
@@ -326,4 +347,5 @@ else
     sat_ice.st=[];sat_ice.ct=[];
     sat_ice.radius=[];
     sat_ice.image=[];
+    sat_ice.status=[];
 end

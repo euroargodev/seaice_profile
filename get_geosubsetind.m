@@ -1,4 +1,4 @@
-function [st,ct,geovars,typevars,S,strext]=get_geosubsetind(lonlims,latlims,indir,filename)
+function [st,ct,geovars,typevars,S,strext]=get_geosubsetind(lonlims,latlims,indir,filename,lonf)
 % Given longitude and latitude limits (LONLIMS and LATLIMS) and the path
 % for a satellite image (stored in a netcdf, with grids stored in variables
 % lon and lat as in OSI-SAF) this function finds the pixels inside those
@@ -17,7 +17,9 @@ function [st,ct,geovars,typevars,S,strext]=get_geosubsetind(lonlims,latlims,indi
 info=ncinfo([indir filename]);
 lat=ncread([indir filename],'lat');
 lon=ncread([indir filename],'lon');
-
+if lonf==360
+    lon=convertlon(lon,360);
+end
 count=0;
 for i=1:numel(info.Variables)
     s=info.Variables(i).Size;
@@ -35,14 +37,14 @@ end
 in=inpolygon(lon,lat,lon_pts,lat_pts);
 [in1,in2]=ind2sub(size(lon),find(in==1));
 if isempty(in1)==0
-in1_lim=[min(in1) max(in1)];
-in2_lim=[min(in2) max(in2)];
+    in1_lim=[min(in1) max(in1)];
+    in2_lim=[min(in2) max(in2)];
 
-st1=in1_lim(1);n1=diff(in1_lim)+1;
-st2=in2_lim(1);n2=diff(in2_lim)+1; 
+    st1=in1_lim(1);n1=diff(in1_lim)+1;
+    st2=in2_lim(1);n2=diff(in2_lim)+1;
 
-st=[st1 st2 1];
-ct=[n1 n2 1];
+    st=[st1 st2 1];
+    ct=[n1 n2 1];
 else
     st=NaN;
     ct=NaN;
